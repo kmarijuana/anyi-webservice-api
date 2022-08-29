@@ -241,3 +241,5 @@ app.ws('/', function(ws, req) {
 });
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
+
+module.exports = app
