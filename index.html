@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <script src="https://cdn.socket.io/4.5.0/socket.io.min.js"
+        integrity="sha384-7EyYLQZgWBi67fBtVxw60/OWl1kjsfrPFcaU0pp0nAh+i8FD068QogUvg85Ewy1k"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+        integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-Fy6S3B9q64WdZWQUiU+q4/2Lc9npb8tCaSX9FK7E8HnRr0Jz8D6OP9dO5Vg3Q9ct"
+        crossorigin="anonymous"></script>
+    <title>Socket.IO chat</title>
+    <style>
+        body {
+            margin: 0;
+            padding-bottom: 3rem;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        #form {
+            background: rgba(0, 0, 0, 0.15);
+            padding: 0.25rem;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            display: flex;
+            height: 3rem;
+            box-sizing: border-box;
+            backdrop-filter: blur(10px);
+        }
+
+        #input,
+        #user {
+            border: none;
+            padding: 0 1rem;
+
+
+            margin: 0.25rem;
+        }
+
+        #user {
+            border-radius: 2rem 0rem 0rem 2rem;
+            flex-grow: 0;
+        }
+
+        #input {
+            border-radius: 0rem 2rem 2rem 0rem;
+            flex-grow: 1;
+        }
+
+        #input:focus {
+            outline: none;
+        }
+
+        #form>button {
+            background: #333;
+            border: none;
+            padding: 0 1rem;
+            margin: 0.25rem;
+            border-radius: 3px;
+            outline: none;
+            color: #fff;
+        }
+
+        #messages {
+            list-style-type: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        #messages>li {
+            padding: 0.5rem 1rem;
+        }
+
+        #messages>li:nth-child(odd) {
+            background: #efefef;
+        }
+
+        .custom-tooltip {
+            --bs-tooltip-bg: var(--bs-primary);
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Modal -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <div class="modal-body">
+
+                    <div class="container">
+                        <div class="row" id="emojeee">
+
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <ul id="messages"></ul>
+    <form id="form" action="">
+        <input id="user" autocomplete="off" placeholder="user" />
+        <!-- <input id="input" autocomplete="off" placeholder="message" /> -->
+
+        <input rows="4" id="input" cols="50" />
+
+        <input type="hidden" id="insert" />
+
+        <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#exampleModal">
+            <i class="fa fa-smile-o fa-2x" style=" flex-grow: 0; color:orange"></i>
+        </button>
+
+        <button>Send</button>
+    </form>
+</body>
+
+</html>
+
+<script>
+    const socket = new WebSocket("ws://invirtualevent.com:8888");
+    socket.addEventListener('open', (event) => {
+        // socket.send('Hello Server!');
+    });
+
+    function makeid(length) {
+        var result = '';
+        var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        var charactersLength = characters.length;
+        for (var i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() *
+                charactersLength));
+        }
+        return result;
+    }
+    // console.log(
+    document.getElementById('user').value = makeid(10)
+    // )
+    // console.log(makeid(5));
+
+    // Listen for messages
+    socket.addEventListener('message', (event) => {
+        // console.log('Message from server ', event.data);
+        // console.log(event.data)
+        let msg = JSON.parse(event.data)
+        console.log(msg)
+        var item = document.createElement('li');
+        item.innerHTML = `${msg.data.value.user} : ${msg.data.value.message}`;
+        messages.appendChild(item);
+        window.scrollTo(0, document.body.scrollHeight);
+        return
+    });
+
+
+    document.getElementById('form').addEventListener('submit', function (e) {
+        e.preventDefault();
+        if (document.getElementById('input').value) {
+            // console.log(document.getElementById('user').value)
+            // sockets.url.emit('chat message', document.getElementById('input').value);
+
+            socket.send(JSON.stringify({ user: document.getElementById('user').value, message: document.getElementById('input').value }));
+            document.getElementById('input').value = '';
+        }
+    });
+
+    //     const handleSend = () => {
+    //   if (ws.readyState === WebSocket.OPEN) {
+    //     ws.send()
+    //   } else {
+    //     // Queue a retry
+    //     setTimeout(() => { handleSend() }, 1000)
+    //   }
+    // };
+
+    // exampleSocket.send("Here's some text that the server is urgently awaiting!");
+
+    // webSocket = new WebSocket('ws://localhost:8888', 'http');
+    // conso
+
+    // localStorage.debug = 'socket.io-client:socket'
+
+    // const sockets = {
+    //     // url: io("chat-anyi.herokuapp.com/"),
+    //     url: io("ws://localhost:8888"),
+    //     init: () => {
+    //         sockets.events();
+    //         document.getElementById('form').addEventListener('submit', function (e) {
+    //             e.preventDefault();
+    //             if (document.getElementById('input').value) {
+    //                 console.log(document.getElementById('input').value)
+    //                 sockets.url.emit('chat message', document.getElementById('input').value);
+    //                 document.getElementById('input').value = '';
+    //             }
+    //         });
+    //     },
+    //     events: () => {
+    //         sockets.url.on('request userID', (data) => {
+    //             console.log(data)
+    //             sockets.url.emit('reponse UserID', Math.floor(Math.random() * 10));
+    //             return
+    //         });
+    //         sockets.url.on('chat message', (data) => {
+    //             console.log(data)
+    //             var item = document.createElement('li');
+    //             item.textContent = data;
+    //             messages.appendChild(item);
+    //             window.scrollTo(0, document.body.scrollHeight);
+    //             return
+    //         });
+    //     },
+
+    // }
+
+    // document.addEventListener("DOMContentLoaded", function (event) {
+    //     sockets.init()
+    // });
+
+    let html = ``;
+    for (let i = 0; i < 45; i++) {
+        html += `<div class="col-sm btn" onclick="setEmoji('${128512 + i}',this)">&#${128512 + i};</div>
+`
+    }
+    $("#emojeee").append(html)
+
+    function setEmoji(id, e) {
+        $('#exampleModal').modal('toggle')
+        socket.send(JSON.stringify({ user: document.getElementById('user').value, message: `&#${id};` }));
+        // $('#exampleModal').modal('toggle')
+        // // $('#input').prop('selectionStart');
+        // // var cursorPos = $('#input').prop('selectionStart');
+        // // $('#input').prop('selectionEnd',cursorPos-2);
+        // // id
+        // document.getElementById("insert").value = `&#${id};`
+        // var curPos =
+        //             document.getElementById("input").selectionStart;
+        //         // console.log(curPos);
+        //         let x = $("#input").val();
+        //         let text_to_insert = $("#insert").val();
+        //         // console.log(x.slice(0, curPos))
+        //         console.log(text_to_insert)
+        //         // console.log(x.slice(curPos))
+        //         $("#input").val(x.slice(0, curPos) + e.innerHTML + x.slice(curPos));
+
+        //         localStorage.setItem("input",x.slice(0, curPos) + text_to_insert + x.slice(curPos))
+        //         // document.getElementById("input").value = e.innerHTML;
+
+        // // .prop('selectionEnd', 13);
+    }
+    // emojee
+
+</script>
