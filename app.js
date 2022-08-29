@@ -197,7 +197,7 @@ var express = require('express');
 var app = express();
 var expressWs = require('express-ws')(app);
 
-const PORT = process.env.PORT || 8888;
+const PORT = process.env.PORT || 3000;
 
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
