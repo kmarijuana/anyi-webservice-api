@@ -230,7 +230,7 @@ app.get('/', function(req, res, next){
   
 var aWss = expressWs.getWss('/');
 
-app.ws('/', function(ws, req) {
+app.ws('/check', function(ws, req) {
     // console.log("HAHI")
   ws.on('message', function(msg) {
     // console.log("YEE")
