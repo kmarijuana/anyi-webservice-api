@@ -218,9 +218,16 @@ app.use(function (req, res, next) {
 app.get('/', function(req, res, next){
 //   console.log('get route', req.testing);
 //   res.end();
-res.sendFile(__dirname + '/index.html');
+// res.sendFile(__dirname + '/index.html');
+const path = `/api/item/${v4()}`;
+    res.setHeader('Content-Type', 'text/html');
+    res.setHeader('Cache-Control', 's-max-age=1, stale-while-revalidate');
+    res.end(`Hello! Go to item: <a href="${path}">${path}</a>`);
 });
 
+
+
+  
 var aWss = expressWs.getWss('/');
 
 app.ws('/', function(ws, req) {
