@@ -216,8 +216,9 @@ app.use(function (req, res, next) {
 });
 
 app.get('/', function(req, res, next){
-  console.log('get route', req.testing);
-  res.end();
+//   console.log('get route', req.testing);
+//   res.end();
+res.sendFile(__dirname + '/index.html');
 });
 
 var aWss = expressWs.getWss('/');
