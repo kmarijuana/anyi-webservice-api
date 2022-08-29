@@ -215,7 +215,7 @@ app.use(function (req, res, next) {
   return next();
 });
 
-app.get('/ready', function(req, res, next){
+app.get('/ready_server', function(req, res, next){
 //   console.log('get route', req.testing);
 //   res.end();
 // res.sendFile(__dirname + '/index.html');
