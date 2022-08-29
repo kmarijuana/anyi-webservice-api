@@ -192,6 +192,7 @@
 // // server.listen(8888);
 
 
+const serverless = require('serverless-http')
 
 var express = require('express');
 var app = express();
@@ -249,4 +250,5 @@ app.ws('/', function(ws, req) {
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
 
-module.exports = app
+app.use('./netlify/functions/')
+module.exports = serverless(app)
