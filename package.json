@@ -1,12 +1,12 @@
 {
   "name": "nodejs_socket",
-  "version": "2.0.0",
+  "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "start": "nodemon app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npm run build --output public"
+    "build": "echo 'hello build'"
   },
   "keywords": [],
   "author": "",
