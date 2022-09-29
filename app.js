@@ -13,12 +13,10 @@
 //     .use(cors({ origin: false }))
 //     .listen(PORT, () => console.log(`Listening on ${PORT}`));
 
-
 // // // app.set('etag', true)
 // // //     .use(bodyParser.json())
 // // //     .use(bodyParser.urlencoded({ extended: true }))
 // // //     .listen(server_port, function() { console.log('listening on *:' + server_port); });
-
 
 // // app.use((req, res, next) => {
 // //     res.header('Access-Control-Allow-Origin', '*');
@@ -29,7 +27,6 @@
 // //     res.header('Date', new Date());
 // //     next();
 // // })
-
 
 // // app.get('/example', (req, res) => {
 // //     res.sendFile(__dirname + '/index.html');
@@ -55,10 +52,10 @@
 // //     events: (socket) => {
 // //         // socket.on('connection', (data) => { clientSocket[data] = socket.id; console.log(clientSocket) });
 // //         // service.api("message", "GET", "", (req, res) => { io.emit('OLD message', { id: socket.id, data: res.body }); })
-// //         socket.on('reponse UserID', (data) => { 
+// //         socket.on('reponse UserID', (data) => {
 // //             console.log(socket.id)
 // //             socketIO.clientSocket[data.id] = socket.id;
-// //             io.emit('connectings', socketIO.clientSocket); 
+// //             io.emit('connectings', socketIO.clientSocket);
 // //         });
 // //         socket.on('chat message', (data) => { io.emit('chat message', data); });
 // //         socket.on('disconnect', () => {
@@ -71,10 +68,6 @@
 // // }
 
 // // process.on('unhandledRejection', (e) => { console.log(e.message, e.stack) })
-
-
-
-
 
 // const WebSocket = require('ws')
 //     // const wss2 = new WebSocketServer({ noServer: true });
@@ -130,7 +123,6 @@
 // //     }
 // //   });
 
-
 // // const socket_handling = {
 // //     init: (socket) => {
 // //         io.emit('request userID', "socket ready");
@@ -139,10 +131,10 @@
 // //     events: (socket) => {
 // //         // socket.on('connection', (data) => { clientSocket[data] = socket.id; console.log(clientSocket) });
 // //         // service.api("message", "GET", "", (req, res) => { io.emit('OLD message', { id: socket.id, data: res.body }); })
-// //         socket.on('reponse UserID', (data) => { 
+// //         socket.on('reponse UserID', (data) => {
 // //             console.log(socket.id)
 // //             socketIO.clientSocket[data.id] = socket.id;
-// //             io.emit('connectings', socketIO.clientSocket); 
+// //             io.emit('connectings', socketIO.clientSocket);
 // //         });
 // //         socket.on('chat message', (data) => { io.emit('chat message', data); });
 // //         socket.on('disconnect', () => {
@@ -191,62 +183,87 @@
 
 // // server.listen(8888);
 
-
-
-var express = require('express');
+var express = require("express");
 var app = express();
-var expressWs = require('express-ws')(app);
+var expressWs = require("express-ws")(app);
 
 const PORT = process.env.PORT || 3000;
 
 app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,PATCH,OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With');
-    res.header('Access-Control-Allow-Credentials', true);
-    res.header('Last-Modified', new Date());
-    res.header('Date', new Date());
-    next();
-})
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header(
+    "Access-Control-Allow-Methods",
+    "GET,PUT,POST,DELETE,PATCH,OPTIONS"
+  );
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, Content-Length, X-Requested-With"
+  );
+  res.header("Access-Control-Allow-Credentials", true);
+  res.header("Last-Modified", new Date());
+  res.header("Date", new Date());
+  next();
+});
 
 app.use(function (req, res, next) {
-  console.log('middleware');
-  req.testing = 'testing';
+  console.log("middleware");
+  req.testing = "testing";
   return next();
 });
 
-app.get('/ready_server', function(req, res, next){
-//   console.log('get route', req.testing);
-//   res.end();
-// res.sendFile(__dirname + '/index.html');
-// const path = `/item`;
-    res.setHeader('Content-Type', 'text/html');
-    res.setHeader('Cache-Control', 's-max-age=1, stale-while-revalidate');
-    res.end(`Express Ready : ${PORT}`);
+app.get("/ready_server", function (req, res, next) {
+  //   console.log('get route', req.testing);
+  //   res.end();
+  // res.sendFile(__dirname + '/index.html');
+  // const path = `/item`;
+  res.setHeader("Content-Type", "text/html");
+  res.setHeader("Cache-Control", "s-max-age=1, stale-while-revalidate");
+  res.end(`Express Ready : ${PORT}`);
 });
 
+let temp = [];
+let temppin = [];
+let limit = 10;
 
+var aWss = expressWs.getWss("/");
 
-  
-var aWss = expressWs.getWss('/');
+aWss.on("connection", function (ws) {
+  // console.log('connection open');
+  ws.send(JSON.stringify({ method: "temp", data: temp }));
+  ws.send(JSON.stringify({ method: "temppin", data: temppin }));
+});
 
-app.ws('/', function(ws, req) {
-    // console.log("HAHI")
-  ws.on('message', function(msg) {
+app.ws("/", function (ws, req) {
+  // console.log("HAHI")
+  ws.on("message", function (msg) {
     // console.log("YEE")
     // ws.send(JSON.stringify({ method: 'message', data: { "value": msg } }));
     console.log(msg);
     // console.log(ws)
-    
+    msg = JSON.parse(msg)
+    if (msg.pin == true) {
+      temppin = { value: msg };
+    } else {
+      if (temp.length > limit) {
+        temp.splice(0, 1);
+      }
+      temp.push({ value: msg });
+    }
+
     aWss.clients.forEach(function each(client) {
       if (client.readyState === ws.OPEN) {
-        client.send(JSON.stringify({ method: 'message', data: { "value": JSON.parse(msg) } }));
+        client.send(
+          JSON.stringify({
+            method: "message",
+            data: { value: msg },
+          })
+        );
       }
-    })
+    });
   });
-  console.log('socket', req.testing);
+  console.log("socket", req.testing);
 });
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
 
-module.exports = app
+module.exports = app;
